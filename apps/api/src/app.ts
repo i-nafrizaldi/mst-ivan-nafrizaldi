@@ -1,15 +1,16 @@
+import cors from 'cors';
 import express, {
-  json,
-  urlencoded,
   Express,
+  json,
+  NextFunction,
   Request,
   Response,
-  NextFunction,
-  Router,
+  urlencoded,
 } from 'express';
-import cors from 'cors';
 import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import { TransactionRouter } from './routers/transaction.router';
+import { CustomerRouter } from './routers/customer.router';
+import { ProductRouter } from './routers/product.router';
 
 export default class App {
   private app: Express;
@@ -42,7 +43,7 @@ export default class App {
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {
           console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
+          res.status(500).send(err.message);
         } else {
           next();
         }
@@ -51,13 +52,17 @@ export default class App {
   }
 
   private routes(): void {
-    const sampleRouter = new SampleRouter();
+    const transactionRouter = new TransactionRouter();
+    const customerRouter = new CustomerRouter();
+    const productRouter = new ProductRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
-      res.send(`Hello, Purwadhika Student API!`);
+      res.send(`Hello!`);
     });
 
-    this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/transaction', transactionRouter.getRouter());
+    this.app.use('/api/customer', customerRouter.getRouter());
+    this.app.use('/api/product', productRouter.getRouter());
   }
 
   public start(): void {
